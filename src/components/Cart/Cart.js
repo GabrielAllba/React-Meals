@@ -7,16 +7,15 @@ import CartItem from './CartItem'
 const Cart = props => {
     const cartCtx = useContext(CartContext)
     const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`
-    console.log(totalAmount)
-    console.log('askldfjakldsf')
-    console.log(cartCtx)
-    
+  
     const hasItems = cartCtx.items.length > 0
     const cartItemRemoveHandler = id => {
-
+      cartCtx.removeItem(id)
+      console.log('riel')
+      console.log(cartCtx)
     }
     const cartItemAddHandler = item => {
-
+      cartCtx.addItem({...item, amount: 1})
     }
     return (
       <Modal onClose={props.onClose}>

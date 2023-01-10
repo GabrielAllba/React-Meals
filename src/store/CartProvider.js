@@ -9,18 +9,56 @@ const defaultCartState = {
 
 const cartReducer = (state, action) => {
     if(action.type === 'ADD'){
-        const updatedItems = state.items.concat(action.item)
-        const updatedTotalAmount = state.totalAmount + action.item.price * action.item.amount
-        console.log('updated')
-        console.log(updatedTotalAmount)
+    
+        const existingCartItemIndex = state.items.findIndex(item => item.id === action.item.id)
+        const updatedTotalAmount = state.totalAmount  + action.item.price * action.item.amount
+        const existingCartItem = state.items[existingCartItemIndex]
+
+        let updatedItems;
+        if(existingCartItem){
+            let updatedItem;
+            
+
+            updatedItem = {
+                ...existingCartItem,
+                amount: existingCartItem.amount + action.item.amount
+            }
+
+            updatedItems = [...state.items]
+            updatedItems[existingCartItemIndex] = updatedItem
+
+        }else{
+            updatedItems = state.items.concat(action.item);
+        }
+
+    
         const result = {
           items: updatedItems,
           totalAmount: updatedTotalAmount,
         };
-        console.log(result)
+        
         return result
-    }else{
-
+    }else if(action.type === 'REMOVE'){
+        const existingCartItemIndex = state.items.findIndex(
+            (item) => item.id === action.id
+        );
+        console.log('in cart provider')
+        console.log(existingCartItemIndex)
+        const existingItem = state.items[existingCartItemIndex]
+        const updatedTotalAmount = state.totalAmount - existingItem.price
+        let updatedItems;
+        if(existingItem.amount === 1){
+            updatedItems = state.items.filter(item => item.id !== action.id)
+        }else{
+            const updatedItem = {...existingItem, amount: existingItem.amount - 1}
+            updatedItems = [...state.items]
+            updatedItems[existingCartItemIndex] = updatedItem
+        }
+        
+        return {
+            items: updatedItems,
+            totalAmount: updatedTotalAmount
+        }
     }
     return;
 };
@@ -41,6 +79,7 @@ const CartProvider = props => {
           type: "REMOVE",
           id: id,
         });
+        console.log('in remove item from cart handler ')
     }
 
     const cartContext = {

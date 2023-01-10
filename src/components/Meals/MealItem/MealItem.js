@@ -15,8 +15,7 @@ const MealItem = props => {
             price: props.price
         })
     }
-    console.log('pppp')
-    console.log(cartCtx)
+  
 
     return (
       <li className={classes.meal}>
