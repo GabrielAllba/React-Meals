@@ -1,10 +1,13 @@
 import Modal from '../UI/Modal'
 import classes from  './Cart.module.css'
-import { useContext } from 'react'
+import { useState, useContext } from 'react'
 import CartContext from '../../store/cart-context'
 import CartItem from './CartItem'
+import Checkout from './Checkout'
 
 const Cart = props => {
+    const [isCheckout, setIsCheckout] = useState(false)
+    
     const cartCtx = useContext(CartContext)
     const totalAmount = `$${cartCtx.totalAmount.toFixed(2)}`
   
@@ -16,6 +19,28 @@ const Cart = props => {
     const cartItemAddHandler = item => {
       cartCtx.addItem({...item, amount: 1})
     }
+
+    const orderHandler = () => {
+      setIsCheckout(true)
+    }
+
+    const submitOrderHandler = (userData) => {
+      fetch("https://react-food-499d4-default-rtdb.firebaseio.com/orders.json", {
+        method: 'POST',
+        body: JSON.stringify({
+          user: userData,
+          orderedItems: cartCtx.items
+        })
+      });
+    }
+
+    const modalActions = <div className={classes.actions}>
+          <button className={classes["button--alt"]} onClick={props.onClose}>
+            Close
+          </button>
+          {hasItems && <button onClick={orderHandler} className={classes.button}>Order</button>}
+        </div>
+
     return (
       <Modal onClose={props.onClose}>
         <ul className={classes["cart-items"]}>
@@ -27,12 +52,9 @@ const Cart = props => {
           <span>Total Amount</span>
           <span>{totalAmount}</span>
         </div>
-        <div className={classes.actions}>
-          <button className={classes["button--alt"]} onClick={props.onClose}>
-            Close
-          </button>
-          {hasItems && <button className={classes.button}>Order</button>}
-        </div>
+        {isCheckout && <Checkout onConfirm={submitOrderHandler} onCancel={props.onClose}></Checkout>}
+        {!isCheckout && modalActions}
+        
       </Modal>
     );
 }
